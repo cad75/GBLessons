@@ -1,0 +1,20 @@
+// HW 9-1//
+SELECT u.first_name, u.last_name, COUNT(*) AS cnt
+	JOIN messages m ON u.id = m.from_user_id
+WHERE m.to_user_id = 1
+GROUP BY u.id, u.first_name, u.last_name
+ORDER BY cnt DESC
+LIMIT 1;
+// HW 9-2//
+SELECT COUNT(*)
+FROM posts_likes pl
+	JOIN posts p ON pl.post_id = p.id
+	JOIN profiles pf ON p.user_id = pf.user_id
+WHERE (YEAR(CURDATE()) - YEAR(birthday) < 18) AND like_type = TRUE;
+// HW 9-3//
+SELECT profiles.gender, COUNT(posts_likes.post_id) AS total_likes
+    JOIN profiles
+      ON posts_likes.user_id = profiles.user_id
+GROUP BY profiles.gender
+ORDER BY total_likes DESC
+LIMIT 1;
