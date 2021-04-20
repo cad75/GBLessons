@@ -1,0 +1,12 @@
+// HW 7-1//
+SELECT DISTINCT u.id, u.name, u.birthday_at
+FROM users AS u
+   JOIN orders AS o ON u.id = o.user_id;
+// HW 7-2/
+SELECT
+  p.id,
+  p.name,
+  p.price,
+  c.name AS catalog
+FROM products AS p
+LEFT JOIN catalogs AS c ON p.catalog_id = c.id;
