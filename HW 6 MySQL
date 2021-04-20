@@ -1,0 +1,28 @@
+// HW 6-1//
+SELECT
+	(SELECT first_name FROM users WHERE id = m.from_user_id) AS first_name,
+    (SELECT last_name FROM users WHERE id = m.from_user_id) AS last_name,
+	COUNT(*) AS messages_sent
+FROM messages m
+WHERE to_user_id = 11
+GROUP BY from_user_id
+ORDER BY messages_sent DESC
+LIMIT 1;
+// HW 6-2//
+SELECT COUNT(*)
+FROM posts_likes
+WHERE post_id IN (
+	SELECT id
+	FROM posts
+	WHERE user_id IN (
+		SELECT user_id
+		FROM profiles
+		WHERE YEAR(CURATED()) - YEAR(birthday) < 18;
+// HW 6-3//
+SELECT
+	(SELECT gender FROM profiles WHERE user_id = posts_likes.user_id) AS gender,
+	COUNT(*) AS total
+FROM posts_likes
+WHERE like_type = 1
+GROUP BY gender
+ORDER BY total DESC;
