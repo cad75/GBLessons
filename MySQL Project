@@ -1,0 +1,133 @@
+CREATE DATABASE law;
+USE law;
+
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(145) NOT NULL,
+  last_name varchar(145) NOT NULL,
+  email varchar(145) NOT NULL,
+  phone varchar(11) DEFAULT NULL,
+  password_hash char(65) NOT NULL,
+  created_at datetime NOT NULL DEFAULT current_timestamp(),
+  UNIQUE KEY email_unique (email),
+  UNIQUE KEY phone_unique (phone)
+) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS tarifs;
+CREATE TABLE tarifs (
+  id_tarif SERIAL PRIMARY KEY,
+  tarif_name VARCHAR(145) NOT NULL,
+  tarif_cost BIGINT UNSIGNED NOT NULL,
+  tarif_time TIMESTAMP,
+  CONSTRAINT fk_tarifs_users FOREIGN KEY (id_tarif) REFERENCES users (id)
+) ENGINE=InnoDB
+
+DROP TABLE IF EXISTS law_act_types;
+CREATE TABLE law_act_types (
+  id_types BIGINT unsigned NOT NULL AUTO_INCREMENT,
+  name_types varchar(145),
+  PRIMARY KEY (id_types),
+  UNIQUE KEY id_types (id_types),
+  CONSTRAINT fk_law_act_types_users FOREIGN KEY (id_types) REFERENCES users (id),
+  CONSTRAINT fk_law_act_types_users_2 FOREIGN KEY (id_types) REFERENCES tarifs (id_tarif)
+) ENGINE=InnoDB
+
+DROP TABLE IF EXISTS lawcode;
+CREATE TABLE lawcode (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  law_types_id BIGINT unsigned NOT NULL,
+  admin_id bigint(20) unsigned NOT NULL,
+  file_name varchar(245) DEFAULT NULL,
+  file_size bigint(20) DEFAULT NULL,
+  created_file DATE NOT NULL,
+  PRIMARY KEY (id),
+  KEY fk_lawcode_law_types_idx (law_types_id),
+  KEY fk_lawcode_admin_idx (admin_id),
+  CONSTRAINT fk_lawcode_law_types FOREIGN KEY (law_types_id) REFERENCES law_act_types (id_types),
+  CONSTRAINT fk_lawcode_admin FOREIGN KEY (admin_id) REFERENCES users (id)
+) ENGINE=InnoDB
+
+DROP TABLE IF EXISTS arbitr_acts;
+CREATE TABLE arbitr_acts (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  arbitr_types_id BIGINT unsigned NOT NULL,
+  admin_id bigint(20) unsigned NOT NULL,
+  file_name varchar(245) DEFAULT NULL,
+  file_size bigint(20) DEFAULT NULL,
+  created_file DATE NOT NULL,
+  PRIMARY KEY (id),
+  KEY fk_arbitr_acts_arbitr_types_idx (arbitr_types_id),
+  KEY fk_arbitr_acts_admin_idx (admin_id),
+  CONSTRAINT fk_arbitr_acts_arbitr_types FOREIGN KEY (arbitr_types_id) REFERENCES law_act_types (id_types),
+  CONSTRAINT fk_arbitr_acts_admin FOREIGN KEY (admin_id) REFERENCES users (id)
+) ENGINE=InnoDB
+
+DROP TABLE IF EXISTS court_acts;
+CREATE TABLE court_acts (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  court_types_id BIGINT unsigned NOT NULL,
+  admin_id bigint(20) unsigned NOT NULL,
+  file_name varchar(245) DEFAULT NULL,
+  file_size bigint(20) DEFAULT NULL,
+  created_file DATE NOT NULL,
+  PRIMARY KEY (id),
+  KEY fk_court_acts_court_types_idx (court_types_id),
+  KEY fk_court_acts_admin_idx (admin_id),
+  CONSTRAINT fk_court_acts_court_types FOREIGN KEY (court_types_id) REFERENCES law_act_types (id_types),
+  CONSTRAINT fk_court_acts_admin FOREIGN KEY (admin_id) REFERENCES users (id)
+) ENGINE=InnoDB
+
+DROP TABLE IF EXISTS documents;
+CREATE TABLE documents (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  documents_types_id BIGINT unsigned NOT NULL,
+  admin_id bigint(20) unsigned NOT NULL,
+  file_name varchar(245) DEFAULT NULL,
+  file_size bigint(20) DEFAULT NULL,
+  created_file DATE NOT NULL,
+  PRIMARY KEY (id),
+  KEY fk_documents_acts_documents_types_idx (documents_types_id),
+  KEY fk_documents_acts_admin_idx (admin_id),
+  CONSTRAINT fk_documents_acts_documents_types FOREIGN KEY (documents_types_id) REFERENCES law_act_types (id_types),
+  CONSTRAINT fk_documents_acts_admin FOREIGN KEY (admin_id) REFERENCES users (id)
+) ENGINE=InnoDB
+
+INSERT INTO users VALUES (1,'Вася','Васин','hhilpert@example.com','09605863452','777555','1994-05-08 00:56:43'),(2,'Петя','Спилберг','emoen@example.com','(410)856-73','cccff6','1998-03-13 18:05:17'),(3,'Джон','Вик','rmcglynn@example.net','1-218-140-9','73938','1991-05-24 04:26:10'), (4,'Акакий','Кант','hhiiueert@example.com','06785863452','7766b5','1995-05-08 01:56:43'), (5,'Симбад','Никуданеход','tillman.connelly@example.org','197.118.011','trhd83','1985-10-16 15:53:55'),(6,'Sub','Zero','colt.haley@example.org','(897)424-80','iuo980','1973-01-06 12:26:21'),(7,'Иван','Ольг','janie.feil@example.com','1-959-911-0','iouwq4','2018-12-04 05:28:01'),(8,'Макс','Фадеев','runte.gino@example.com','1-605-939-9','jkjhfs','1984-07-06 09:16:08'),(9,'Мартин','Трамп','qking@example.com','+85(3)52735','6789','1973-12-21 13:32:23'),(10,'Олеся','Стинг','kuhlman.alexandrine@example.com','+03(4)71924','1234','1989-05-26 14:24:16');
+INSERT INTO tarifs VALUES (1,'Лайт','1000','03.04.2021'), (2,'Премиум','3000','03.09.2021'), (3,'Супер премиум','5000','03.04.2022');
+INSERT INTO law_act_types VALUES (1, 'Кодексы'), (2, 'Арбитражный суд и Суды общей юрисдикции'), (3, 'Документы');
+INSERT INTO lawcode VALUES (1, 1, 2, 'Уголовный', '50', '1994-05-08 00:56:43'), (2, 1, 3, 'Гражданский', '76', '1997-06-09 00:56:43'), (3, 1, 5, 'Земельный', '34', '1995-03-09 00:56:43'), (4, 1, 6, 'Водный', '56', '1999-09-09 00:56:43'), (5, 1, 2, 'Семейный', '98', '2000-01-15 00:56:43');
+INSERT INTO arbitr_acts VALUES (1, 2, 1, 'Решение АС Самарской области', '51', '2004-05-08 00:56:43'), (2, 2, 3, 'Решение ФАС Волжского округа', '74', '2008-06-09 00:56:43'), (3, 2, 8, 'Определение 11 апелляционного суда', '38', '1999-03-09 00:56:43'), (4, 2, 1, 'Решение АС города Москва', '543', '1999-09-09 00:56:43'), (5, 2, 7, 'Решение АС Воронежской области', '28', '2010-01-15 00:56:43');
+INSERT INTO court_acts VALUES (1, 2, 9, 'Решение Самарского областного суда', '55', '2003-05-08 00:56:43'), (2, 2, 7, 'Решение ВС РФ', '103', '2011-04-09 00:56:43'), (3, 2, 3, 'Решения мировых судов', '498', '2012-05-09 00:56:43'), (4, 2, 8, 'Решение 6 Кассационного суда', '570', '2019-10-09 00:56:43'), (5, 2, 10, 'Решение Октябрьского районного суда', '71', '2015-01-15 00:56:43');
+INSERT INTO documents VALUES (1, 3, 1, 'Ходатайства', '700', '2009-03-08 00:56:43'), (2, 3, 2, 'Исковые заявления', '987', '2017-01-09 00:56:43'), (3, 3, 3, 'Протоколы', '666', '2014-03-09 00:56:43'), (4, 3, 4, 'Комментарии', '432', '2020-11-09 00:56:43'), (5, 3, 5, 'Возражения', '345', '2021-05-15 00:56:43');
+
+CREATE OR REPLACE VIEW admin_law
+AS
+(SELECT u.id AS id, u.first_name AS name, u.last_name AS last_name
+FROM users AS u
+JOIN arbitr_acts AS aa ON (u.id = aa.admin_id)
+
+);
+
+SELECT id, name, last_name FROM admin_law
+WHERE id = 3;
+
+DELIMITER //
+
+CREATE TRIGGER check_created_file_insert BEFORE INSERT ON documents
+FOR EACH ROW
+BEGIN
+	IF NEW.created_file >= CURRENT_DATE() THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insert canceled';
+END IF;
+END//
+
+CREATE TRIGGER check_created_file_update BEFORE UPDATE ON documents
+FOR EACH ROW
+BEGIN
+	IF NEW.created_file >= CURRENT_DATE() THEN
+	SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Update canceled';
+END IF;
+END//
+
+DELIMITER ;
